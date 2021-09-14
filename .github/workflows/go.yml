@@ -41,3 +41,9 @@ jobs:
         go test -tags ci -covermode=atomic -coverprofile=coverage.out ./...
         if [ $coverage -lt 80 ]; then echo "Test coverage lowered"; exit 1; fi
       if: ${{ runner.os == 'Linux' }}
+
+    - name: Update PR Coverage
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: coverage.out
+      if: ${{ runner.os == 'Linux' && github.event_name == 'push' }}
