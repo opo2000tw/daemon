@@ -25,9 +25,11 @@ jobs:
       run: sudo apt-get update && sudo apt-get install gcc libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libx11-dev xorg-dev
       if: ${{ runner.os == 'Linux' }}
 
+    - name: Execute Makefile
+      run: make all
 
-    - name: Build
+    - name: Build GO
       run: go build -v ./...
 
-    - name: Test
+    - name: Test GO
       run: go test -v ./...
