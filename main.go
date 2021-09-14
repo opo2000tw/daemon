@@ -2,21 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strconv"
-	"time"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"time"
 )
 
 const appTitle = "daemon"
 
 var AnotherWindow = true
+var TabsContainer = true
 
 func main() {
 	mainApp := setUp()
@@ -26,20 +21,14 @@ func main() {
 		return w
 	}(mainApp)
 
-	mainWindow.SetContent(
-		container.New(
-			layout.NewVBoxLayout(),
-			//layout.NewSpacer(),
-			widget.NewLabel("111"),
-			widget.NewButton("顯示PID", func() {
-				dialog.ShowInformation("確認", "PID:"+strconv.FormatInt(int64(os.Getpid()), 10), mainWindow)
-			}),
-			layout.NewSpacer(),
-		),
-	)
+	if TabsContainer {
+		tabs := NewTabsExample()
+		mainWindow.SetContent(tabs)
+	}
+	//fyne.Preferences()
 
 	if AnotherWindow {
-		go setAnotherWin(mainApp)
+		go NewDelayWindow(mainApp, 200, 200, 5)
 	}
 
 	mainWindow.ShowAndRun()
