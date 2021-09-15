@@ -49,3 +49,21 @@ https://developer.fyne.io/started/cross-compiling
 
 https://gist.github.com/sighingnow/deee806603ec9274fd47
 https://github.com/mouuff/go-rocket-update-example
+
+---
+# RW
+```
+src:
+  - bufio
+    - bufio.go
+  - bytes
+    - buffer.go
+    - reader.go
+  - io
+    - ioutil
+      - ioutil.go
+    - io.go
+  - os
+    - file.go
+  - strings  
+```

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/q191201771/naza/pkg/nazalog"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
@@ -14,6 +16,14 @@ const appTitle = "daemon"
 var AnotherWindow = true
 var WindowToContainer = true
 
+type fileGroup struct {
+	PID *FileWriter
+}
+
+var g = &fileGroup{
+	PID: &FileWriter{},
+}
+
 func main() {
 	mainApp := setUp()
 	mainWindow := func(fyne.App) fyne.Window {
@@ -21,6 +31,10 @@ func main() {
 		w.Resize(fyne.NewSize(300, 200))
 		return w
 	}(mainApp)
+
+	if err := g.PID.RW(write, "a.txt", "w2"); err != nil {
+		nazalog.Fatal("%+v", err)
+	}
 
 	if WindowToContainer {
 		NewTabsExample(mainWindow)
