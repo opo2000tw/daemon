@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
-	"time"
 )
 
 const appTitle = "daemon"

@@ -1,15 +1,16 @@
 package main
 
 import (
+	"os"
+	"strconv"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"os"
-	"strconv"
-	"time"
 )
 
 func NewDelayWindow(a fyne.App, w float32, h float32, sec time.Duration) {
