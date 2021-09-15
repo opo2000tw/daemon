@@ -11,7 +11,7 @@ import (
 const appTitle = "daemon"
 
 var AnotherWindow = true
-var TabsContainer = true
+var WindowToContainer = true
 
 func main() {
 	mainApp := setUp()
@@ -21,11 +21,10 @@ func main() {
 		return w
 	}(mainApp)
 
-	if TabsContainer {
-		tabs := NewTabsExample()
-		mainWindow.SetContent(tabs)
+	if WindowToContainer {
+		NewTabsExample(mainWindow)
+		//NewMainWindow(mainWindow)
 	}
-	//fyne.Preferences()
 
 	if AnotherWindow {
 		go NewDelayWindow(mainApp, 200, 200, 5)
