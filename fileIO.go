@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log"
 	"os"
+	"reflect"
+	"unsafe"
 
 	"github.com/q191201771/naza/pkg/nazalog"
 )
@@ -20,12 +22,12 @@ const (
 var errFile = errors.New("FileWriter: fuck")
 
 type FileWriter struct {
-	fileName string
-	fp       *os.File
+	str string
+	fp  *os.File
 }
 
 func (f *FileWriter) Open(filename string) (err error) {
-	f.fp, err = os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	f.fp, err = os.OpenFile(filename, os.O_APPEND|os.O_RDWR, os.ModeAppend)
 	return err
 }
 
@@ -46,13 +48,12 @@ func (f *FileWriter) Dispose() (err error) {
 }
 
 func (f *FileWriter) RW(s int, filename string, data string) (err error) {
-	if f.fp == nil {
-		err = f.Create(filename)
-		if err != nil {
+	if _, err := os.Stat(filename); err != nil {
+		if err = f.Create(filename); err != nil {
 			return err
 		}
-		err = f.Open(filename)
-		if err != nil {
+	} else {
+		if err = f.Open(filename); err != nil {
 			return err
 		}
 	}
@@ -65,10 +66,8 @@ func (f *FileWriter) RW(s int, filename string, data string) (err error) {
 		if err := f.Remove(filename); err != nil {
 			return err
 		}
-	case retrieve:
-		nazalog.Debugf("%+v", f.Name())
 	case read:
-		//f.fp.ReadString
+		f.ReadString()
 	case write:
 		f.WriteString(data)
 	default:
@@ -95,7 +94,7 @@ func (f *FileWriter) WriteString(b string) (err error) {
 	return err
 }
 
-func (f *FileWriter) WriteRaw(b []byte) (err error) {
+func (f *FileWriter) WriteByte(b []byte) (err error) {
 	if f.fp == nil {
 		return errFile
 	}
@@ -103,7 +102,7 @@ func (f *FileWriter) WriteRaw(b []byte) (err error) {
 	return err
 }
 
-func (f *FileWriter) ReadString(b []byte) (err error) {
+func (f *FileWriter) ReadString() (err error) {
 	if f.fp == nil {
 		return errFile
 	}
@@ -114,4 +113,18 @@ func (f *FileWriter) ReadString(b []byte) (err error) {
 	}
 	nazalog.Debugf("read %d bytes: %q\n", count, data[:count])
 	return nil
+}
+
+func string2Bytes(s string) []byte {
+	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
+	bh := reflect.SliceHeader{
+		Data: sh.Data,
+		Len:  sh.Len,
+		Cap:  sh.Len,
+	}
+	return *(*[]byte)(unsafe.Pointer(&bh))
+}
+
+func bytes2String(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }
