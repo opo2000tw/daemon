@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/mitchellh/go-homedir"
 	"github.com/q191201771/naza/pkg/nazalog"
 )
@@ -17,11 +19,11 @@ func DirPath(expaned string) string {
 }
 
 func dirHome() string {
-	dirHome, err := homedir.Dir()
-	if err != nil {
-		nazalog.Fatal(err)
+	if path, err := os.UserHomeDir(); err == nil {
+		return path
+	} else {
+		return ""
 	}
-	return dirHome
 }
 
 func dirHomeExpand(expaned string) string {

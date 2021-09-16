@@ -29,9 +29,20 @@ func main() {
 	}(mainApp)
 
 	func() {
+		if err := g.PID.RW(write, "a.txt", "123"); err != nil {
+			nazalog.Fatalf("%+v", err)
+		}
+		//nazalog.Fatalf("%+v", g.PID.Name())
+		if err := g.PID.RW(write, "a.txt", "123\n123\n"); err != nil {
+			nazalog.Fatalf("%+v", err)
+		}
 		if err := g.PID.RW(read, "a.txt", "123"); err != nil {
 			nazalog.Fatalf("%+v", err)
 		}
+		if err := g.PID.RW(delete, "a.txt", "123"); err != nil {
+			nazalog.Fatalf("%+v", err)
+		}
+		nazalog.Fatalf("%+v", g.PID.Name())
 	}()
 
 	if WindowToContainer {

@@ -53,6 +53,8 @@ https://github.com/mouuff/go-rocket-update-example
 ---
 # RW
 ```
+https://ithelp.ithome.com.tw/articles/10204484
+https://learnku.com/articles/23559/two-schemes-for-reading-golang-super-large-files
 https://juejin.cn/post/6864886461746855949
 src:
   - bufio
@@ -66,5 +68,5 @@ src:
     - io.go
   - os
     - file.go
-  - strings  
+  - strings
 ```

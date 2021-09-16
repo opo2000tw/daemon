@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"errors"
-	"log"
+	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"unsafe"
-
-	"github.com/q191201771/naza/pkg/nazalog"
 )
 
 const (
@@ -21,98 +21,92 @@ const (
 
 var errFile = errors.New("FileWriter: fuck")
 
-type FileWriter struct {
-	str string
-	fp  *os.File
+type fileGroup struct {
+	PID *FileWriter
 }
 
-func (f *FileWriter) Open(filename string) (err error) {
+type FileWriter struct {
+	fp *os.File
+}
+
+func (f *FileWriter) open(filename string) (err error) {
 	f.fp, err = os.OpenFile(filename, os.O_APPEND|os.O_RDWR, os.ModeAppend)
 	return err
 }
 
-func (f *FileWriter) Create(filename string) (err error) {
+func (f *FileWriter) create(filename string) (err error) {
 	f.fp, err = os.Create(filename)
 	return err
 }
 
-func (f *FileWriter) Remove(filename string) (err error) {
+func (f *FileWriter) remove(filename string) (err error) {
 	return os.Remove(filename)
 }
 
-func (f *FileWriter) Dispose() (err error) {
-	if f.fp == nil {
-		return errFile
-	}
+func (f *FileWriter) dispose() (err error) {
 	return f.fp.Close()
 }
 
 func (f *FileWriter) RW(s int, filename string, data string) (err error) {
 	if _, err := os.Stat(filename); err != nil {
-		if err = f.Create(filename); err != nil {
+		if err = f.create(filename); err != nil {
 			return err
 		}
 	} else {
-		if err = f.Open(filename); err != nil {
+		if err = f.open(filename); err != nil {
 			return err
 		}
 	}
-	defer f.fp.Close()
+	defer f.dispose()
 	switch s {
 	case delete:
-		if err := f.Dispose(); err != nil {
-			return err
-		}
-		if err := f.Remove(filename); err != nil {
+		if err := f.remove(filename); err != nil {
 			return err
 		}
 	case read:
-		f.ReadString()
+		if err := f.readString(); err != nil {
+			return err
+		}
 	case write:
-		f.WriteString(data)
+		if err := f.writeString(data); err != nil {
+			return err
+		}
 	default:
-		nazalog.Debugf("can't find this option")
+		return errFile
 	}
 	return nil
 }
 
 func (f *FileWriter) Name() string {
-	if f.fp == nil {
-		return ""
-	}
 	return f.fp.Name()
 }
 
-func (f *FileWriter) WriteString(b string) (err error) {
-	if f.fp == nil {
-		return errFile
-	}
+func (f *FileWriter) writeString(b string) (err error) {
 	_, err = f.fp.WriteString(b)
-	if err != nil {
-		log.Fatal(err)
-	}
 	return err
 }
 
-func (f *FileWriter) WriteByte(b []byte) (err error) {
-	if f.fp == nil {
-		return errFile
-	}
+func (f *FileWriter) writeByte(b []byte) (err error) {
 	_, err = f.fp.Write(b)
 	return err
 }
 
-func (f *FileWriter) ReadString() (err error) {
-	if f.fp == nil {
-		return errFile
+func (f *FileWriter) readString() (err error) {
+	lineReader := bufio.NewReader(f.fp)
+	for {
+		// 相同使用場景下可以採用的方法
+		// func (b *Reader) ReadLine() (line []byte, isPrefix bool, err error)
+		// func (b *Reader) ReadBytes(delim byte) (line []byte, err error)
+		// func (b *Reader) ReadString(delim byte) (line string, err error)
+		line, _, err := lineReader.ReadLine()
+		if err == io.EOF {
+			break
+		}
+		// 如下是某些業務邏輯操作
+		// 如下程式碼列印每次讀取的檔案行內容
+		fmt.Println(string(line))
 	}
-	data := make([]byte, 100)
-	count, err := f.fp.Read(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	nazalog.Debugf("read %d bytes: %q\n", count, data[:count])
-	return nil
+	return err
 }
 
 func string2Bytes(s string) []byte {
